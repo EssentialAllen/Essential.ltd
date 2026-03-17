@@ -140,12 +140,13 @@
             overflow: hidden;
             background-color: transparent !important;
             /* Override hover:bg-gray-50 */
-            transition: border-color 0.5s ease;
+            transition: border-color 0.5s ease, background-color 0.5s ease;
         }
 
         .galaxy-box:hover,
         .galaxy-box.is-active-mobile {
-            border-color: transparent;
+            border-color: black;
+            background-color: black !important;
         }
 
         .galaxy-canvas {
@@ -1071,6 +1072,20 @@
                             progressBar.style.transform = `translateY(${(step - 1) * 100}%)`;
                         }
                     });
+                });
+            }
+        });
+    </script>
+    <script src="../assets/splashCursor.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const galaxyCanvas = document.getElementById('galaxyCanvas');
+            if (galaxyCanvas && typeof window.initSplashCursor === 'function') {
+                window.initSplashCursor(galaxyCanvas, {
+                    SPLAT_RADIUS: 0.4,
+                    SPLAT_FORCE: 6000,
+                    SHADING: true,
+                    TRANSPARENT: true
                 });
             }
         });
