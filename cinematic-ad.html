@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESSENTIAL ADVISORY | Cinematic Advertisement</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <!-- GSAP Core -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        body { margin: 0; background-color: #000; overflow: hidden; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; color: #fff; }
+        
+        /* 16:9 Cinematic Container */
+        .card { 
+            position: relative; 
+            width: 100vw; 
+            height: 100vh; 
+            background: #000; 
+            overflow: hidden; 
+        }
+
+        /* Enforce 16:9 aspect ratio wrapper for cinematic feel */
+        .cinematic-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100vw;
+            height: 56.25vw; /* 16:9 aspect ratio */
+            max-height: 100vh;
+            max-width: 177.78vh; /* 16:9 aspect ratio */
+            background: #000;
+            overflow: hidden;
+            box-shadow: 0 0 100px rgba(0,0,0,1);
+        }
+
+        .slide { 
+            position: absolute; 
+            inset: 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            visibility: hidden; 
+            flex-direction: column; 
+            padding: 4rem; 
+            text-align: center; 
+            z-index: 10;
+        }
+
+        .bg-img { 
+            position: absolute; 
+            inset: 0; 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            z-index: 0; 
+            filter: grayscale(100%) contrast(1.2); 
+            opacity: 0.6; /* Default opacity */
+            transform-origin: center center;
+        }
+        
+        .overlay-dark { position: absolute; inset: 0; background: rgba(0,0,0,0.5); z-index: 1; }
+        .overlay-black-gradient { position: absolute; inset: 0; background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%); z-index: 1; }
+        
+        /* Typography System */
+        .text-chaos { font-size: clamp(4rem, 12vw, 15rem); font-weight: 900; line-height: 0.9; text-transform: uppercase; margin: 0; letter-spacing: -0.05em; color: #fff; text-shadow: 0 0 40px rgba(0,0,0,0.8); }
+        .text-huge { font-size: clamp(3rem, 8vw, 8rem); font-weight: 900; line-height: 1.05; text-transform: uppercase; margin: 0; letter-spacing: -0.04em; }
+        .text-large { font-size: clamp(2rem, 5vw, 4rem); font-weight: 800; line-height: 1.1; text-transform: uppercase; margin: 0; letter-spacing: -0.02em; }
+        .text-med { font-size: clamp(1rem, 2.5vw, 2rem); font-weight: 400; line-height: 1.4; text-transform: uppercase; margin: 0; letter-spacing: 0.1em; color: #ccc; }
+        
+        /* Geometric / Graphic Elements */
+        .geo-box { position: absolute; border: 2px solid white; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; opacity: 0; }
+        .glitch-flash { position: absolute; inset: 0; background: white; z-index: 99; opacity: 0; mix-blend-mode: difference; }
+        
+        /* Minimal Logo */
+        .brand-logo { font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 0.5em; letter-spacing: 0.1em; text-transform: uppercase; }
+        
+        /* Play Interface */
+        #playBtn { 
+            position: absolute; 
+            z-index: 100;
+            top: 50%; left: 50%; 
+            transform: translate(-50%, -50%);
+            padding: 20px 48px; 
+            background: #fff; 
+            color: #000; 
+            border-radius: 4px;
+            font-weight: 900; 
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            border: none;
+        }
+        #playBtn:hover { background: #ccc; }
+
+        /* Timer / Progress bar */
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: rgba(255,255,255,0.8);
+            width: 0%;
+            z-index: 100;
+        }
+
+    </style>
+</head>
+<body>
+
+    <button id="playBtn">Play Cinematic Ad</button>
+
+    <div class="card" id="vidContainer" style="opacity: 0.2;">
+        <div class="cinematic-wrapper">
+            
+            <!-- Global Flash layer for hits -->
+            <div class="glitch-flash" id="flash"></div>
+            
+            <!-- Audio Placeholder (User can swap src) -->
+            <audio id="soundtrack" src="assets/sample.mp4" preload="auto"></audio>
+
+            <!-- PART 1: CHAOS (0-12s) -->
+            <!-- Background Images -->
+            <img class="bg-img" id="bg-chaos1" src="assets/city_chaos_1773644319645.png" style="visibility: hidden;">
+            <img class="bg-img" id="bg-chaos2" src="assets/digital_web_1773644336185.png" style="visibility: hidden;">
+            
+            <div class="overlay-black-gradient" id="overlay-chaos" style="visibility: hidden;"></div>
+
+            <div class="slide" id="s1-1"><h1 class="text-chaos">YOU</h1></div>
+            <div class="slide" id="s1-2"><h1 class="text-large">WANT TO GROW<br>YOUR BUSINESS</h1></div>
+            <div class="slide" id="s1-3"><h1 class="text-huge">FOLLOW<br>THE TRENDS</h1></div>
+            <div class="slide" id="s1-4"><h1 class="text-huge">HIRED<br>THE PROS</h1></div>
+            <div class="slide" id="s1-5"><h1 class="text-huge">BUILD<br>THE FUNNELS</h1></div>
+            <div class="slide" id="s1-6"><h1 class="text-chaos">AND</h1></div>
+            <div class="slide" id="s1-7"><h1 class="text-large">YOU'RE CREATING<br>AMAZING ASSETS</h1></div>
+            <div class="slide" id="s1-8"><h1 class="text-chaos">NOT</h1></div>
+            <div class="slide" id="s1-9"><h1 class="text-huge">GETTING<br>THE RESULTS</h1></div>
+
+            <!-- PART 2: INTERRUPTION (12-24s) -->
+            <img class="bg-img" id="bg-macro" src="assets/macro_eye_1773644352390.png" style="visibility: hidden; opacity: 0.3;">
+            <div class="overlay-dark" id="overlay-interruption" style="visibility: hidden;"></div>
+            
+            <div class="slide" id="s2-1"><h1 class="text-large text-gray-400">HERE'S WHAT<br>NOBODY TOLD YOU</h1></div>
+            <div class="slide" id="s2-2"><h1 class="text-huge">MOST ASSETS<br>YOU HAVE BUILT</h1></div>
+            <div class="slide bg-black" id="s2-3"><h1 class="text-chaos text-red-500">STOP</h1></div>
+            <div class="slide" id="s2-4"><h1 class="text-huge">IS<br>UNNECESSARY</h1></div>
+            <div class="slide" id="s2-5"><h1 class="text-large">MOST MARKETING<br>YOU WERE TOLD TO DO</h1></div>
+            <div class="slide" id="s2-6"><h1 class="text-huge">IS FOR<br>YESTERDAY</h1></div>
+
+            <!-- PART 3: TRANSITION (24-30s) -->
+            <img class="bg-img" id="bg-hallway" src="assets/brutalist_hallway_1773644369612.png" style="visibility: hidden; opacity: 0.8;">
+            <div class="geo-box" id="geo1" style="width: 200px; height: 200px;"></div>
+            <div class="geo-box" id="geo2" style="width: 400px; height: 400px;"></div>
+            <div class="geo-box" id="geo3" style="width: 800px; height: 800px;"></div>
+
+            <!-- PART 4: SOLUTION (30-48s) -->
+            <img class="bg-img" id="bg-calm" src="assets/minimal_ocean_room_1773644385406.png" style="visibility: hidden; opacity: 0.4;">
+            
+            <div class="slide" id="s4-1"><h1 class="brand-logo">ESSENTIAL ADVISORY</h1></div>
+            <div class="slide" id="s4-2">
+                <h1 class="text-med mb-4">MARKETING SOLUTION BUILT FOR THE</h1>
+                <h1 class="text-huge">AI ERA</h1>
+            </div>
+            <div class="slide" id="s4-3"><h1 class="text-large">WE FOCUS ON THE<br>IMPORTANT 80%</h1></div>
+            <div class="slide" id="s4-4">
+                <h1 class="text-large">AUDIT</h1>
+                <h1 class="text-large">SIMPLIFY</h1>
+                <h1 class="text-large">SCALE</h1>
+                <h1 class="text-med mt-6">WHAT WORKS</h1>
+            </div>
+            <div class="slide" id="s4-5"><h1 class="text-large">WHERE EFFORT<br>PRODUCES<br>REAL OUTCOMES</h1></div>
+
+            <!-- PART 5: FINAL PHILOSOPHY (48-50+) -->
+            <img class="bg-img" id="bg-silhouette" src="assets/rooftop_silhouette_1773644400646.png" style="visibility: hidden; opacity: 0.5;">
+            
+            <div class="slide" id="s5-1"><h1 class="text-huge">80% CORE</h1></div>
+            <div class="slide" id="s5-2"><h1 class="text-huge">NOT<br>20% POLISH</h1></div>
+            <div class="slide" id="s5-3"><h1 class="text-large">ONCE YOU SEE<br>WHAT'S ESSENTIAL</h1></div>
+            <div class="slide" id="s5-4"><h1 class="text-large text-gray-500">BEING OVERWHELMED</h1><h1 class="text-huge mt-4">BECOMES A CHOICE</h1></div>
+            
+            <!-- Logo Reveal -->
+            <div class="slide bg-black" id="s5-final">
+                <div class="brand-logo">ESSENTIAL <span class="w-[2px] h-[1em] bg-white opacity-50 mx-2"></span> ADVISORY</div>
+            </div>
+
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <script>
+        gsap.defaults({ ease: "none" });
+        gsap.set('.slide', { autoAlpha: 0 }); 
+
+        const tl = gsap.timeline({ paused: true });
+
+        // Helper for quick hits
+        function flash() {
+            gsap.fromTo('#flash', { opacity: 1 }, { opacity: 0, duration: 0.1, ease: 'power4.out' });
+        }
+
+        // Full 50s timeline construction
+        
+        // --- PART 1: CHAOS (0-12s) ---
+        // Base visuals
+        tl.set(['#bg-chaos1', '#overlay-chaos'], { autoAlpha: 1 }, 0)
+          .to('#bg-chaos1', { scale: 1.1, duration: 6 }, 0) // slow zoom
+          .set('#bg-chaos2', { autoAlpha: 1 }, 6) // switch bg halfway
+          .to('#bg-chaos2', { scale: 1.1, duration: 6 }, 6);
+          
+        // Typography Cuts (fast pacing)
+        tl.set('#s1-1', { autoAlpha: 1 }, 1)
+          .to('#s1-1 h1', { scale: 1.05, duration: 0.8 }, 1)
+          .set('#s1-1', { autoAlpha: 0 }, 1.8)
+          
+          .set('#s1-2', { autoAlpha: 1 }, 2)
+          .set('#s1-2', { autoAlpha: 0 }, 3)
+          
+          .set('#s1-3', { autoAlpha: 1 }, 3.5)
+          .call(flash, null, 3.5)
+          .set('#s1-3', { autoAlpha: 0 }, 4.5)
+          
+          .set('#s1-4', { autoAlpha: 1 }, 5)
+          .set('#s1-4', { autoAlpha: 0 }, 6)
+          
+          .set('#s1-5', { autoAlpha: 1 }, 6.5)
+          .call(flash, null, 6.5)
+          .set('#s1-5', { autoAlpha: 0 }, 7.5)
+          
+          .set('#s1-6', { autoAlpha: 1 }, 8) // AND
+          .to('#s1-6 h1', { scale: 1.2, duration: 0.4 }, 8)
+          .set('#s1-6', { autoAlpha: 0 }, 8.4)
+          
+          .set('#s1-7', { autoAlpha: 1 }, 8.5)
+          .set('#s1-7', { autoAlpha: 0 }, 10)
+          
+          .set('#s1-8', { autoAlpha: 1 }, 10.2) // NOT
+          .to('#s1-8 h1', { scale: 1.5, duration: 0.3 }, 10.2)
+          .set('#s1-8', { autoAlpha: 0 }, 10.5)
+          
+          .set('#s1-9', { autoAlpha: 1 }, 10.8)
+          .call(flash, null, 10.8)
+          .set('#s1-9', { autoAlpha: 0 }, 12);
+          
+
+        // --- PART 2: INTERRUPTION (12-24s) ---
+        // Slower, dramatic, high contrast
+        tl.set(['#bg-chaos2', '#overlay-chaos'], { autoAlpha: 0 }, 12)
+          .set(['#bg-macro', '#overlay-interruption'], { autoAlpha: 1 }, 12)
+          .to('#bg-macro', { x: -20, duration: 12 }, 12); // slow pan
+          
+        tl.set('#s2-1', { autoAlpha: 1 }, 12.5)
+          .fromTo('#s2-1 h1', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 1, ease: 'power2.out' }, 12.5)
+          .set('#s2-1', { autoAlpha: 0 }, 14.5)
+          
+          .set('#s2-2', { autoAlpha: 1 }, 15) // MOST ASSETS YOU HAVE BUILT
+          .fromTo('#s2-2 h1', { scale: 0.9, opacity: 0}, { scale: 1, opacity: 1, duration: 1.5, ease: 'power3.out' }, 15)
+          .set('#s2-2', { autoAlpha: 0 }, 17.5)
+          
+          .set('#s2-3', { autoAlpha: 1 }, 17.5) // STOP (Hard flash red)
+          .call(flash, null, 17.5)
+          .set('#s2-3', { autoAlpha: 0 }, 18.2)
+          
+          .set('#s2-4', { autoAlpha: 1 }, 18.5) // IS UNNECESSARY
+          .fromTo('#s2-4 h1', { letterSpacing: '0.2em' }, { letterSpacing: '-0.04em', duration: 1, ease: 'power4.out' }, 18.5)
+          .set('#s2-4', { autoAlpha: 0 }, 20.5)
+          
+          .set('#s2-5', { autoAlpha: 1 }, 21) // MOST MARKETING
+          .fromTo('#s2-5 h1', { opacity: 0 }, { opacity: 1, duration: 0.5 }, 21)
+          .set('#s2-5', { autoAlpha: 0 }, 22.5)
+          
+          .set('#s2-6', { autoAlpha: 1 }, 23) // IS FOR YESTERDAY
+          .set('#s2-6', { autoAlpha: 0 }, 24);
+          
+
+        // --- PART 3: TRANSITION (24-30s) ---
+        // Visual Reset - Geometric tunnel
+        tl.set(['#bg-macro', '#overlay-interruption'], { autoAlpha: 0 }, 24)
+          .set('#bg-hallway', { autoAlpha: 1 }, 24)
+          .fromTo('#bg-hallway', { scale: 1.5 }, { scale: 1, duration: 6, ease: 'power2.inOut' }, 24);
+          
+        tl.to('#geo1', { opacity: 1, scale: 0.1, rotation: 45, duration: 2, ease: 'power2.in' }, 24)
+          .to('#geo2', { opacity: 1, scale: 0.2, rotation: -45, duration: 2.5, ease: 'power2.in' }, 24.5)
+          .to('#geo3', { opacity: 1, scale: 0.5, rotation: 90, duration: 3, ease: 'power2.in' }, 25)
+          .to(['#geo1', '#geo2', '#geo3'], { opacity: 0, duration: 0.5 }, 29);
+          
+        // --- PART 4: SOLUTION (30-48s) ---
+        // Calm Minimalist Architecture
+        tl.set('#bg-hallway', { autoAlpha: 0 }, 30)
+          .set('#bg-calm', { autoAlpha: 1 }, 30)
+          .to('#bg-calm', { scale: 1.05, duration: 18, ease: 'none' }, 30);
+          
+        tl.set('#s4-1', { autoAlpha: 1 }, 30.5) // ESSENTIAL ADVISORY
+          .fromTo('#s4-1', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 1.5, ease: 'power2.out' }, 30.5)
+          .to('#s4-1', { opacity: 0, duration: 1 }, 33)
+          
+          .set('#s4-2', { autoAlpha: 1 }, 34) // AI ERA
+          .fromTo('#s4-2', { filter: 'blur(10px)', opacity: 0 }, { filter: 'blur(0px)', opacity: 1, duration: 1.5 }, 34)
+          .to('#s4-2', { opacity: 0, duration: 1 }, 37)
+          
+          .set('#s4-3', { autoAlpha: 1 }, 38) // IMPORTANT 80%
+          .fromTo('#s4-3', { opacity: 0 }, { opacity: 1, duration: 1 }, 38)
+          .to('#s4-3', { opacity: 0, duration: 0.5 }, 40.5)
+          
+          .set('#s4-4', { autoAlpha: 1 }, 41) // AUDIT, SIMPLIFY...
+          .fromTo('#s4-4 h1', { x: -20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, stagger: 0.3 }, 41)
+          .to('#s4-4', { opacity: 0, duration: 0.5 }, 44)
+          
+          .set('#s4-5', { autoAlpha: 1 }, 44.5) // REAL OUTCOMES
+          .fromTo('#s4-5', { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 1.5 }, 44.5)
+          .to('#s4-5', { opacity: 0, duration: 1 }, 47.5);
+
+
+        // --- PART 5: FINAL PHILOSOPHY (48-50s + outro buffer) ---
+        tl.set('#bg-calm', { autoAlpha: 0 }, 48)
+          .set('#bg-silhouette', { autoAlpha: 1 }, 48)
+          .to('#bg-silhouette', { scale: 1.02, duration: 6, ease: 'none' }, 48);
+
+        tl.set('#s5-1', { autoAlpha: 1 }, 48) // 80% CORE
+          .fromTo('#s5-1', { opacity: 0 }, { opacity: 1, duration: 0.5 }, 48)
+          .set('#s5-1', { autoAlpha: 0 }, 49)
+          
+          .set('#s5-2', { autoAlpha: 1 }, 49) // NOT 20% POLISH
+          .fromTo('#s5-2', { opacity: 0 }, { opacity: 1, duration: 0.5 }, 49)
+          .set('#s5-2', { autoAlpha: 0 }, 50)
+          
+          .set('#s5-3', { autoAlpha: 1 }, 50.5) // ONCE YOU SEE
+          .fromTo('#s5-3', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 1 }, 50.5)
+          .set('#s5-3', { autoAlpha: 0 }, 52)
+          
+          .set('#s5-4', { autoAlpha: 1 }, 52.5) // BECOMES A CHOICE
+          .fromTo('#s5-4', { opacity: 0 }, { opacity: 1, duration: 1 }, 52.5)
+          .to('#s5-4', { opacity: 0, duration: 1 }, 54.5)
+          
+          .set('#s5-final', { autoAlpha: 1 }, 55.5) // FINAL LOGO
+          .fromTo('#s5-final', { opacity: 0 }, { opacity: 1, duration: 2 }, 55.5);
+
+        // Progress bar sync
+        tl.to('#progressBar', { width: '100%', duration: tl.duration(), ease: "none" }, 0);
+
+        document.getElementById('playBtn').addEventListener('click', () => {
+            document.getElementById('playBtn').style.display = 'none';
+            gsap.to('#vidContainer', {opacity: 1, filter: 'blur(0px)', duration: 0.5});
+            
+            // Audio playback
+            const bgAudio = document.getElementById('soundtrack');
+            bgAudio.currentTime = 0;
+            bgAudio.play().catch(e => console.log("Audio play prevented:", e));
+            
+            tl.restart();
+        });
+
+    </script>
+</body>
+</html>

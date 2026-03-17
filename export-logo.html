@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Export Instagram Logo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #111;
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .preview {
+            margin-top: 20px;
+            border: 1px solid #333;
+            max-width: 500px;
+            display: block;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background: white;
+            color: black;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #eee;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>ESSENTIAL Logo Generator</h1>
+        <p>This generates a 1080x1080 PNG logo perfectly sized for an Instagram Profile.</p>
+        <canvas id="logoCanvas" width="1080" height="1080" class="preview"></canvas>
+        <button id="downloadBtn">Download PNG</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait for custom font to be fully loaded
+            document.fonts.ready.then(() => {
+                const canvas = document.getElementById('logoCanvas');
+                const ctx = canvas.getContext('2d');
+
+                // Draw Background
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(0, 0, 1080, 1080);
+
+                // Draw Text
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '600 140px Inter'; // Semi-bold, large size
+                ctx.letterSpacing = '-0.025em'; // tracking-tight
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                // Draw precisely in the center
+                ctx.fillText('ESSENTIAL', 540, 540);
+
+                // Download logic
+                document.getElementById('downloadBtn').addEventListener('click', () => {
+                    const link = document.createElement('a');
+                    link.download = 'essential-instagram-logo.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

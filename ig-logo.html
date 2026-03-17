@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Export Instagram Logo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" rel="stylesheet">
+    <script>
+        document.fonts.ready.then(() => {
+            drawLogo();
+        });
+
+        function drawLogo() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Black background
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw with 600 weight Inter font
+            ctx.font = "600 96px Inter, system-ui, -apple-system, sans-serif";
+            canvas.style.letterSpacing = '-2.4px';
+
+            ctx.textBaseline = "middle";
+
+            const textLeft = "ESSENTIAL";
+            const textRight = "本质";
+
+            const leftWidth = ctx.measureText(textLeft).width;
+
+            // Note: need to calculate rightWidth, but measureText works well enough after we set context options
+            const totalWidth = leftWidth + 30 + 34 + ctx.measureText(textRight).width;
+
+            const startX = (canvas.width - totalWidth) / 2;
+
+            ctx.fillStyle = '#FFFFFF'; // White text
+            ctx.fillText(textLeft, startX, canvas.height / 2 + 5);
+
+            // Draw custom geometric pipeline separator aligned perfectly with the Chinese text
+            const separatorX = startX + leftWidth + 30; // 30px gap
+            // 80 height perfectly brackets the visual boundaries of '本质' at 96px font-size
+            ctx.fillRect(separatorX, canvas.height / 2 - 35, 4, 80);
+
+            ctx.fillText(textRight, separatorX + 34, canvas.height / 2 + 5);
+        }
+    </script>
+</head>
+
+<body>
+    <canvas id="canvas" width="1080" height="1080" style="width: 50%"></canvas>
+</body>
+
+</html>

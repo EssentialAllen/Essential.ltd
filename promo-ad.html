@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESSENTIAL | Premium Promo Ad</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- GSAP Core -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        body { margin: 0; background-color: #0d0d0d; overflow: hidden; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        
+        /* The container simulates a mobile screen for desktop preview */
+        .card { 
+            position: relative; 
+            width: 100%; 
+            max-width: 450px; /* roughly mobile width */
+            height: 100%; 
+            max-height: 800px;
+            aspect-ratio: 9/16; 
+            border-radius: 32px; 
+            overflow: hidden; 
+            background: #111; 
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 20px 80px rgba(0,0,0,0.9);
+            margin: auto;
+        }
+
+        /* Responsive on mobile -> take full height */
+        @media (max-aspect-ratio: 9/16) {
+            .card { border-radius: 0; max-height: none; max-width: none; }
+        }
+
+        .slide { 
+            position: absolute; 
+            inset: 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            visibility: hidden; /* GSAP controls visibility via autoAlpha */
+            flex-direction: column; 
+            padding: 2.5rem; 
+            text-align: center; 
+            z-index: 10;
+        }
+        
+        .slide-content { position: relative; z-index: 10; width: 100%; }
+        
+        /* Global Video layers for match-cutting scenes */
+        .bg-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+        .overlay-black { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 1; }
+        
+        /* Typographic System - Scale fluidly */
+        .text-huge { font-size: clamp(3rem, 15cqw, 4.5rem); font-weight: 900; line-height: 1.05; text-transform: uppercase; margin: 0; letter-spacing: -0.04em; }
+        .text-large { font-size: clamp(2rem, 10cqw, 3rem); font-weight: 900; line-height: 1.05; text-transform: uppercase; margin: 0; letter-spacing: -0.03em; }
+        .text-med { font-size: clamp(1.2rem, 6cqw, 1.8rem); font-weight: 800; line-height: 1.1; text-transform: uppercase; margin: 0; letter-spacing: -0.02em; }
+        .text-small { font-size: clamp(0.75rem, 3cqw, 0.9rem); font-weight: 700; text-transform: uppercase; letter-spacing: 0.25em; }
+        
+        /* Masking wrappers for slide/reveal text animations */
+        .mask-wrap { overflow: hidden; display: block; vertical-align: top; padding-bottom: 6px; margin-bottom: -6px; }
+        .mask-wrap-inline { overflow: hidden; display: inline-block; vertical-align: bottom; }
+        .mask-text { display: block; transform: translateY(110%); will-change: transform; }
+        
+        /* Themes / Contrast */
+        .theme-light { background: #F4F4F4; color: #050505; }
+        .theme-dark { background: #050505; color: #F4F4F4; }
+        
+        /* Edge Branding Text (rotated 90deg on sides) */
+        .side-branding { 
+            position: absolute; 
+            top: 50%; 
+            transform: translateY(-50%) rotate(-90deg); 
+            font-size: 0.65rem; 
+            font-weight: 700; 
+            letter-spacing: 0.3em; 
+            text-transform: uppercase; 
+            z-index: 20; 
+            white-space: nowrap;
+        }
+        .side-left { left: -50px; }
+        .side-right { right: -50px; transform: translateY(-50%) rotate(90deg); }
+        .theme-light .side-branding { color: rgba(0,0,0,0.25); }
+        .theme-dark  .side-branding { color: rgba(255,255,255,0.25); }
+
+        /* Enable Container Queries on the card */
+        .card { container-type: inline-size; }
+        
+        /* Logo design */
+        .brand-logo { font-size: 1.5rem; font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 0.5em; letter-spacing: -0.02em; }
+        .brand-sep { width: 2px; height: 1em; background: currentColor; opacity: 0.8; }
+        .logo-subtitle { font-size: 0.75rem; letter-spacing: 0.3em; font-weight: 700; color: #666; margin-top: 1rem; text-transform: uppercase; }
+
+        /* Minimal architectural grids */
+        .grid-line-h { position: absolute; width: 100%; height: 1px; background: rgba(0,0,0,0.1); top: 50%; z-index: 0; }
+        .grid-line-v { position: absolute; width: 1px; height: 100%; background: rgba(0,0,0,0.1); left: 50%; z-index: 0; }
+        .theme-dark .grid-line-h, .theme-dark .grid-line-v { background: rgba(255,255,255,0.08); }
+
+        /* Play Interface */
+        #playBtn { 
+            position: absolute; 
+            z-index: 100;
+            top: 50%; left: 50%; 
+            transform: translate(-50%, -50%);
+            padding: 20px 48px; 
+            background: #fff; 
+            color: #000; 
+            border-radius: 100px;
+            font-weight: 900; 
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            font-size: 0.875rem;
+            border: none;
+        }
+        #playBtn:hover { transform: translate(-50%, -50%) scale(1.05); box-shadow: 0 15px 50px rgba(0,0,0,0.7); }
+    </style>
+</head>
+<body>
+
+    <button id="playBtn">Play Video & Audio</button>
+
+    <div class="card" id="vidContainer" style="opacity: 0.2; filter: blur(20px);">
+        
+        <!-- Global Audio to drive the ad synced to reference -->
+        <audio id="adAudio" src="assets/sample.mp4" preload="auto"></audio>
+
+        <!-- Global Videos for seamless match cuts between text scenes (pulling from reference) -->
+        <!-- We use fragments #t=0,5 to pull clips from the video itself to act as dynamic B-roll -->
+        <video id="vidBg1" class="bg-vid" src="assets/sample.mp4#t=5,15" loop muted playsinline style="visibility: hidden;"></video>
+        <video id="vidBg2" class="bg-vid" src="assets/sample.mp4#t=16,25" loop muted playsinline style="visibility: hidden;"></video>
+        <div class="overlay-black" id="vidOverlay" style="visibility: hidden;"></div>
+
+        <!-- S1: The Hook -->
+        <div class="slide theme-light" id="slide1">
+            <div class="side-branding side-left">The Ugly Truth</div>
+            <div class="grid-line-v"></div>
+            <div class="grid-line-h"></div>
+            <div class="slide-content text-left w-full">
+                <div class="text-small mb-6 text-gray-500">Fact check:</div>
+                <div class="mask-wrap"><span class="mask-text text-huge text-black txt-s1">MOST</span></div>
+                <div class="mask-wrap"><span class="mask-text text-large text-gray-800 txt-s1">MARKETING</span></div>
+            </div>
+        </div>
+
+        <!-- S2: Unnecessary (Hard Cut, Inverted Theme) -->
+        <div class="slide theme-dark" id="slide2">
+            <div class="slide-content text-right w-full">
+                <div class="mask-wrap"><span class="mask-text text-huge text-white txt-s2">IS</span></div>
+                <div class="mask-wrap"><span class="mask-text text-huge text-white txt-s2">100%</span></div>
+                <div class="mask-wrap"><span class="mask-text text-large text-gray-400 txt-s2">UNNECESSARY.</span></div>
+            </div>
+        </div>
+
+        <!-- S3: Solution (Fast Stagger) -->
+        <div class="slide theme-light" id="slide3">
+            <div class="slide-content text-left w-full">
+                <div class="mask-wrap"><span class="mask-text text-huge txt-s3">WE</span></div><br>
+                <div class="mask-wrap"><span class="mask-text text-huge txt-s3">REMOVE</span></div><br>
+                <div class="mask-wrap"><span class="mask-text text-large txt-s3 text-gray-500">THE NOISE.</span></div>
+            </div>
+        </div>
+
+        <!-- S4: And Focus (Video BG 1 from sample) -->
+        <div class="slide theme-dark" id="slide4">
+            <div class="slide-content text-right w-full">
+                <div class="mask-wrap"><span class="mask-text text-large text-gray-300 txt-s4">AND</span></div>
+                <div class="mask-wrap"><span class="mask-text text-huge text-white txt-s4">FOCUS</span></div>
+                <div class="mask-wrap"><span class="mask-text text-huge text-white txt-s4">ON</span></div>
+            </div>
+        </div>
+
+        <!-- S5: What Works (Video BG 1 from sample Match cut) -->
+        <div class="slide theme-dark" id="slide5">
+            <div class="slide-content">
+                <div class="txt-pop text-huge text-white">WHAT</div>
+                <div class="txt-pop text-huge text-white">ACTUALLY</div>
+                <div class="txt-pop-delayed text-huge text-white mt-4 border-2 border-white px-4 py-2">WORKS</div>
+            </div>
+        </div>
+
+        <!-- S6: 80/20 -->
+        <div class="slide theme-light" id="slide6">
+            <div class="side-branding side-right">0–80 Principle</div>
+            <div class="slide-content">
+                <div class="mask-wrap flex justify-center items-end gap-1 text-black">
+                    <span class="mask-text txt-s6 text-huge">0</span>
+                    <span class="mask-text txt-s6 text-huge">-</span>
+                    <span class="mask-text txt-s6 text-huge">80</span>
+                    <span class="mask-text txt-s6 text-large mb-1">%</span>
+                </div>
+                <div class="mask-wrap mt-4"><span class="mask-text text-med text-gray-400 txt-s6">BUILDS THE</span></div>
+                <div class="mask-wrap"><span class="mask-text text-med text-gray-800 txt-s6 flex items-center justify-center gap-4">FOUNDATION <div class="w-12 h-1 bg-black"></div></span></div>
+            </div>
+        </div>
+
+        <!-- S7: Removing the rest -->
+        <div class="slide theme-dark" id="slide7">
+            <div class="slide-content">
+                <div class="mask-wrap"><span class="mask-text txt-s7 text-huge text-white">NO</span></div>
+                <div class="mask-wrap"><span class="mask-text txt-s7 text-med text-gray-400">HUGE TEAMS</span></div>
+                <div class="h-8"></div>
+                <div class="mask-wrap"><span class="mask-text txt-s7 text-huge text-white">NO</span></div>
+                <div class="mask-wrap"><span class="mask-text txt-s7 text-med text-gray-400">VANITY METRICS</span></div>
+            </div>
+        </div>
+
+        <!-- S8: Only The (Video BG 2 from sample) -->
+        <div class="slide theme-dark" id="slide8">
+            <div class="slide-content">
+                <div class="txt-pop-fast text-huge text-white">ONLY</div>
+                <div class="txt-pop-fast text-huge text-white">THE</div>
+            </div>
+        </div>
+
+        <!-- S9: Essential. (Video BG 2 from sample Match cut) -->
+        <div class="slide theme-dark" id="slide9">
+            <div class="slide-content flex items-center justify-center">
+                <!-- Inner mask so it reveals up sharply -->
+                <div class="mask-wrap inline-block"><span class="mask-text txt-s9 text-huge text-white">ESSENTIAL.</span></div>
+            </div>
+        </div>
+
+        <!-- S10: End Card -->
+        <div class="slide theme-light" id="slide10">
+            <div class="slide-content text-center">
+                <div class="brand-logo txt-s10">
+                    ESSENTIAL <div class="brand-sep"></div> 本质
+                </div>
+                <div class="logo-subtitle txt-s10">Brand & Growth Advisory</div>
+                
+                <div class="mt-20 txt-s10 flex flex-col items-center">
+                    <div class="text-xs font-bold tracking-widest text-black uppercase mb-4">Replay</div>
+                    <button class="w-14 h-14 bg-black text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform cursor-pointer focus:outline-none" onclick="location.reload()">
+                        <svg class="w-6 h-6 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                    </button>
+                    
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        gsap.defaults({ ease: "power4.out" });
+        gsap.set('.slide', { autoAlpha: 0 }); 
+
+        const tl = gsap.timeline({ paused: true });
+
+        document.getElementById('playBtn').addEventListener('click', () => {
+            document.getElementById('playBtn').style.display = 'none';
+            gsap.to('#vidContainer', {opacity: 1, filter: 'blur(0px)', duration: 0.5});
+            
+            // Start the audio from the sample reference video
+            const adAudio = document.getElementById('adAudio');
+            adAudio.currentTime = 0;
+            adAudio.volume = 1;
+            adAudio.play();
+
+            document.getElementById('vidBg1').play();
+            document.getElementById('vidBg2').play();
+            
+            tl.restart();
+        });
+
+        // The MasterClass Ad Formula: 
+        // 1. Text slides up super fast from hidden masks
+        // 2. Lingers for less than a second
+        // 3. Instant hard cut to the next scene (no fading out)
+        // 4. Invert colors rapidly to command attention
+
+        // 1: Hook (0s - 1.2s)
+        tl.set('#slide1', { autoAlpha: 1 })
+          .fromTo('.txt-s1', { y: '110%' }, { y: '0%', duration: 0.5, stagger: 0.1 })
+          .to('#slide1', { autoAlpha: 0, duration: 0 }, "+=0.6"); 
+
+        // 2: Unnecessary (1.2s - 2.4s)
+        tl.set('#slide2', { autoAlpha: 1 })
+          .fromTo('.txt-s2', { y: '110%' }, { y: '0%', duration: 0.4, stagger: 0.08 })
+          .to('#slide2', { autoAlpha: 0, duration: 0 }, "+=0.6"); 
+
+        // 3: The Noise (2.4s - 3.6s)
+        tl.set('#slide3', { autoAlpha: 1 })
+          .fromTo('.txt-s3', { y: '110%' }, { y: '0%', duration: 0.4, stagger: 0.12 })
+          .to('#slide3', { autoAlpha: 0, duration: 0 }, "+=0.5"); 
+
+        // 4: Focus On (3.6s - 4.6s) WITH VIDEO 1
+        tl.set(['#vidBg1', '#vidOverlay', '#slide4'], { autoAlpha: 1 })
+          .fromTo('.txt-s4', { y: '110%' }, { y: '0%', duration: 0.4, stagger: 0.1 })
+          .to('#slide4', { autoAlpha: 0, duration: 0 }, "+=0.5"); 
+
+        // 5: What Works (4.6s - 5.8s) MATCH CUT VIDEO 1
+        tl.set('#slide5', { autoAlpha: 1 })
+          // Quick scale typographic impacts
+          .fromTo('.txt-pop', { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, stagger: 0.1 })
+          .fromTo('.txt-pop-delayed', { scale: 1.2, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(2)" }, "+=0.1")
+          .to('#slide5', { autoAlpha: 0, duration: 0 }, "+=0.6")
+          .set(['#vidBg1', '#vidOverlay'], { autoAlpha: 0 });
+
+        // 6: 80/20 (5.8s - 7.0s)
+        tl.set('#slide6', { autoAlpha: 1 })
+          .fromTo('.txt-s6', { y: '110%' }, { y: '0%', duration: 0.4, stagger: 0.05 })
+          .to('#slide6', { autoAlpha: 0, duration: 0 }, "+=0.6");
+
+        // 7: No huge teams (7.0s - 8.2s)
+        tl.set('#slide7', { autoAlpha: 1 })
+          .fromTo('.txt-s7', { y: '110%' }, { y: '0%', duration: 0.3, stagger: 0.08 })
+          .to('#slide7', { autoAlpha: 0, duration: 0 }, "+=0.7");
+
+        // 8: Only The (8.2s - 9.0s) WITH VIDEO 2
+        tl.set(['#vidBg2', '#slide8'], { autoAlpha: 1 })
+          .fromTo('.txt-pop-fast', { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, stagger: 0.1, ease: 'back.out(1.5)' })
+          .to('#slide8', { autoAlpha: 0, duration: 0 }, "+=0.4"); 
+
+        // 9: Essential. (9.0s - 10.5s) MATCH CUT VIDEO 2
+        tl.set('#slide9', { autoAlpha: 1 })
+          .fromTo('.txt-s9', { y: '110%' }, { y: '0%', duration: 0.5, ease: 'expo.out' })
+          .to('#slide9', { autoAlpha: 0, duration: 0.3 }, "+=0.8") // fade out finale
+          .to('#vidBg2', { autoAlpha: 0, duration: 0.3 }, "<");
+
+        // 10: End Card (10.5s -> )
+        tl.set('#slide10', { autoAlpha: 1 })
+          .fromTo('.txt-s10', { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.15 })
+          .call(() => {
+              // Fade out the audio track slowly at the end
+              gsap.to('#adAudio', {volume: 0, duration: 2});
+          });
+
+    </script>
+</body>
+</html>

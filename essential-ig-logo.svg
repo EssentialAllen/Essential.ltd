@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600&amp;display=swap');
+      .logo-text {
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: 140px;
+        fill: #ffffff;
+        letter-spacing: -0.025em;
+      }
+    </style>
+  </defs>
+  <rect width="1080" height="1080" fill="#000000" />
+  <text x="540" y="540" class="logo-text" text-anchor="middle" dominant-baseline="central">ESSENTIAL</text>
+</svg>
